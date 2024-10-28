@@ -13,6 +13,7 @@
   <url>https://www.djm.com</url>
   <modules>
     <module>registration</module>
+    <module>eureka-server</module>
   </modules>
 
   <properties>
