@@ -1,0 +1,9 @@
+
+PUT http://localhost:15672/api/exchanges/%2F/test-user
+Authorization: Basic guest guest
+Content-Type: application/json
+
+{
+  "type": "topic"
+}
+###

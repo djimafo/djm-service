@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: 'postgres:13'
+    environment:
+      POSTGRES_DB: registration
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+    ports:
+      - '5432:5432'
+
+  mail-dev:
+    container_name: mail-dev-bsn
+    image: maildev/maildev
+    ports:
+      - 1080:1080
+      - 1025:1025

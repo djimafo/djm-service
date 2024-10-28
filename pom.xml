@@ -6,16 +6,21 @@
   <groupId>com.djm</groupId>
   <artifactId>djm-service</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
   <name>djm-service</name>
   <!-- FIXME change it to the project's website -->
   <url>https://www.djm.com</url>
+  <modules>
+    <module>registration</module>
+  </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
     <spring-boot-maven-plugin-version>3.3.5</spring-boot-maven-plugin-version>
     <spring-boot-dependencies-version>3.3.5</spring-boot-dependencies-version>
+    <spring.cloud.version>2023.0.3</spring.cloud.version>
   </properties>
 
   <dependencyManagement>
@@ -24,6 +29,13 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
         <version>${spring-boot-dependencies-version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring.cloud.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -38,6 +50,10 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
   </dependencies>
 
