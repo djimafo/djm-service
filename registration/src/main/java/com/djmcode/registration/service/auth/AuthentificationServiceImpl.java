@@ -1,17 +1,10 @@
 package com.djmcode.registration.service.auth;
 
-import java.security.SecureRandom;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-
 import com.djmcode.registration.entitie.Token;
 import com.djmcode.registration.entitie.User;
 import com.djmcode.registration.repo.RoleRepository;
 import com.djmcode.registration.repo.TokenRepository;
 import com.djmcode.registration.repo.UserRepository;
-import com.djmcode.registration.service.email.EmailService;
-import com.djmcode.registration.service.email.EmailTemplateName;
 import com.djmcode.registration.service.jwt.JwtService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +13,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +27,9 @@ public class AuthentificationServiceImpl implements AuthentificationService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
-    private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RestTemplate restTemplate;
 
     @Value("${application.mailding.activation_url}")
     private String activationUrl;
@@ -56,7 +55,8 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         var authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         var user = ((User) authenticate.getPrincipal());
         var claims = new HashMap<String, Object>();
-        claims.put("fullName", user.fullName());        String jwToken = jwtService.generateToken(claims, user);
+        claims.put("fullName", user.fullName());
+        String jwToken = jwtService.generateToken(claims, user);
 
         return AuthResponse.builder()
                 .token(jwToken).build();
@@ -90,8 +90,19 @@ public class AuthentificationServiceImpl implements AuthentificationService {
 
         String email = user.getEmail();
         String firstname = user.getFirstname();
-        activationUrl = activationUrl + "?token=" + activationtCode;
-        emailService.sendConfirmationMail(email, firstname, "Account Activation", EmailTemplateName.ACTIVATE_ACCOUNT, activationUrl, activationtCode);
+        String url = activationUrl+ "?token=" + activationtCode;
+        ActivationAccountRequest request = ActivationAccountRequest.builder()
+                .email(email)
+                .name(firstname)
+                .subject("Account Activation")
+                .urlConfirmation(url)
+                .activationCode(activationtCode)
+                .build();
+        //todo creer un micro service (notification) pour ceci
+
+        restTemplate.postForObject("http://localhost:8888/notification/api/v1/activate-account",
+                request,
+                String.class);
 
     }
 
@@ -105,6 +116,5 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         }
         return activationCode.toString();
     }
-
 
 }
